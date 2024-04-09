@@ -40,6 +40,16 @@
     color: #2859b3;
 }
 
+.dataBoxContainer{
+    transition: opacity 1s;
+    opacity: 0;
+}
+
+.dataBoxContainerLoaded{
+    transition: opacity 1s;
+    opacity: 1;
+}
+
 .dataBox{
     margin: 40px 0;
 }

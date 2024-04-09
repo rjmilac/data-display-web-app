@@ -4,11 +4,13 @@ import Image from "next/image";
 import React, { useState, useEffect, useRef} from 'react';
 import styles from "./weatherWidget.module.css";
 import axios from "axios";
-import { timeStamp } from "console";
+import Select from 'react-select'
 
 export default function WeatherDataWidget() {
 
-    const [coordinates, setCoordinates] = useState('51.507351,-0.127758');
+    const [coordinates, setCoordinates] = useState('na');
+    const [isLoaded, setIsLoaded] = useState(0);
+    const [selectValue, setSelectValue] = useState({ label : 'Choose a city', value : 'na'});
     const [weatherData, setWeatherData] = useState({ error : true, data : {
         name : '',
         main : {
@@ -32,12 +34,9 @@ export default function WeatherDataWidget() {
     }
 
     useEffect(() => {
-        let frags = coordinates.split(',');
 
-        axios.get( generateApiUrl(frags[0], frags[1]) ).then(function (response) {
-            setWeatherData({error: false, data : response.data});
-        })
-        .catch(function (error) {
+        if(coordinates == 'na'){
+
             setWeatherData({error : true, data : {
                 name : '',
                 main : {
@@ -55,11 +54,41 @@ export default function WeatherDataWidget() {
                 },
                 dt : 0
             }})
-        });
+
+        } else {
+            let frags = coordinates.split(',');
+
+            axios.get( generateApiUrl(frags[0], frags[1]) ).then((response) => {
+                setWeatherData({error: false, data : response.data});
+            })
+            .catch((error) => {
+                setWeatherData({error : true, data : {
+                    name : '',
+                    main : {
+                        temp : 0,
+                        temp_min : 0,
+                        temp_max : 0,
+                        humidity : 0
+                    },
+                    clouds : { all : '' },
+                    weather : [],
+                    wind : {
+                        deg : 0,
+                        gust: 0,
+                        speed: 0
+                    },
+                    dt : 0
+                }})
+            }).then( () => { setIsLoaded(1) });
+        }
 
     }, [coordinates]);
 
     const cities = [
+        {
+            label : 'Choose a city',
+            value : 'na'
+        },
         {
             label : 'London, UK',
             value : '51.507351,-0.127758'
@@ -83,14 +112,18 @@ export default function WeatherDataWidget() {
         if(navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((pos) => {
                 let coords = pos.coords.latitude +','+pos.coords.longitude
+                setSelectValue({ label : 'Choose a city', value : 'na'});
                 setCoordinates(coords);
             });
-        }
+        } 
 
     }
 
-    const setCoordinatesByCity = (event) => {
-        setCoordinates(event.target.value);
+    const setCoordinatesByCity = (selected) => {
+        setSelectValue(selected);
+        if(selected.value != 'na'){
+            setCoordinates(selected.value);
+        }
     }
 
     const formatDateTime = (unix_timestamp) => {
@@ -109,49 +142,51 @@ export default function WeatherDataWidget() {
     
     return (
         <div className={styles.container}>
-            <p className={styles.topBar}>
-                <select onChange={setCoordinatesByCity}>
-                    <option disabled selected>Choose a city</option>
-                    {cities.map(({ value, label }, index) => <option key={index} value={value} >{label}</option>)}
-                </select>
+            <div className={styles.topBar}>
+                <Select id="city-select" options={cities} value={selectValue} onChange={setCoordinatesByCity} placeholder="Choose a city" />
                 <span>or</span>
                 <button type="button" onClick={getCurrentLocation}>use your current location</button>
-            </p>
+            </div>
 
-            {
-                !weatherData.error && 
-                <div>
-                    <h3>Showing weather data for "{weatherData.data.name}" on {formatDateTime(weatherData.data.dt)}</h3>
-                    <div className={styles.dataBox}>
-                        <h5>Weather</h5>
-                        <ul>
-                            {weatherData.data.weather.map(({ main, description, icon }, index) => 
-                            <li key={index}><img src={getIconUrl(icon)} /><p> {main} <span>{description}</span></p></li> )}
-                        </ul>
-                        <h5>General</h5>
-                        <ul>
-                            <li><div>Temperature</div><div>{weatherData.data.main.temp}°C</div></li>
-                            <li><div>Min Temperature</div><div>{weatherData.data.main.temp_min}°C</div></li>
-                            <li><div>Max Temperature</div><div>{weatherData.data.main.temp_max}°C</div></li>
-                            <li><div>Humidity</div><div>{weatherData.data.main.humidity}%</div></li>
-                            <li><div>Cloudiness</div><div>{weatherData.data.clouds.all}%</div></li>
-                        </ul>
-                        <h5>Wind</h5>
-                        <ul>
-                            <li><div>Direction</div><div>{weatherData.data.wind.deg}°</div></li>
-                            <li><div>Gust</div><div>{weatherData.data.wind.gust} m/sec</div></li>
-                            <li><div>Speed</div><div>{weatherData.data.wind.speed} m/sec</div></li>
-                        </ul>
+            
+            <div className={(isLoaded) ? styles.dataBoxContainerLoaded : styles.dataBoxContainer}>
+
+                {
+                    !weatherData.error && 
+                    <div>
+                        <h3>Showing weather data for "{weatherData.data.name}" on {formatDateTime(weatherData.data.dt)}</h3>
+                        <div className={styles.dataBox}>
+                            <h5>Weather</h5>
+                            <ul>
+                                {weatherData.data.weather.map(({ main, description, icon }, index) => 
+                                <li key={index}><img src={getIconUrl(icon)} /><p> {main} <span>{description}</span></p></li> )}
+                            </ul>
+                            <h5>General</h5>
+                            <ul>
+                                <li><div>Temperature</div><div>{weatherData.data.main.temp}°C</div></li>
+                                <li><div>Min Temperature</div><div>{weatherData.data.main.temp_min}°C</div></li>
+                                <li><div>Max Temperature</div><div>{weatherData.data.main.temp_max}°C</div></li>
+                                <li><div>Humidity</div><div>{weatherData.data.main.humidity}%</div></li>
+                                <li><div>Cloudiness</div><div>{weatherData.data.clouds.all}%</div></li>
+                            </ul>
+                            <h5>Wind</h5>
+                            <ul>
+                                <li><div>Direction</div><div>{weatherData.data.wind.deg}°</div></li>
+                                <li><div>Gust</div><div>{weatherData.data.wind.gust} m/sec</div></li>
+                                <li><div>Speed</div><div>{weatherData.data.wind.speed} m/sec</div></li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            }
+                }
 
-            {
-                weatherData.error &&
-                <div>
-                    <h3>No data available.</h3>
-                </div>
-            }
+                {
+                    weatherData.error &&
+                    <div>
+                        <h3>No weather data available.</h3>
+                    </div>
+                }
+
+            </div>
 
         </div>
     );
