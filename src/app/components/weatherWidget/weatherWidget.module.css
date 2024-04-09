@@ -1,0 +1,86 @@
+.container{
+    background-color: transparent;
+    padding: 0 0 5vw 0;
+}
+
+.topBar{
+    padding-bottom: 40px;
+    border-bottom: 1px solid #cfcfcf;
+    margin-bottom: 40px;
+}
+
+.topBar button, 
+.topBar select{
+    display: inline-block;
+    vertical-align: middle;
+    margin: 10px 10px;
+    padding: 10px 25px;
+    border: 1px solid #efefef;
+}
+
+.topBar p{
+    line-height: 1.5em;;
+}
+
+.topBar button{
+    transition: 0.35s;
+    background-color: #2859b3;
+    color: #ffffff;
+    cursor: pointer;
+    border: none;
+}
+
+.topBar button:hover{
+    background: #2d2d2d;
+    color: #efefef;
+}
+
+.container h3{
+    font-weight: 400;
+    color: #2859b3;
+}
+
+.dataBox{
+    margin: 40px 0;
+}
+
+.dataBox h5{
+    font-size: 1.1em;
+    color: #2d2d2d;
+    font-weight: 700;
+    margin-bottom: 1em;
+}
+
+.dataBox ul{
+    list-style-type: none;
+    margin-bottom: 30px;
+}
+
+
+.dataBox ul li{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    max-width: 600px;
+    line-height: 1.5em;
+}
+
+.dataBox ul li > div{
+    flex: 0 0 45%;
+}
+
+.dataBox ul li > div:first-child{
+    font-weight: 200;
+    color: #2d2d2d;
+}
+
+.dataBox ul li img{
+    display: inline-block;
+}
+
+.dataBox ul li > p > span{
+    font-style: italic;
+    font-weight: 200;
+    color: #5f5f5f;
+}
