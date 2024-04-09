@@ -72,7 +72,7 @@ export default function WeatherDataWidget() {
     }
 
     const getIconUrl = (icon) => {
-        return "http://openweathermap.org/img/w/"+icon+".png";
+        return 'http://openweathermap.org/img/w/'+icon+'.png';
     }
     
     return (
