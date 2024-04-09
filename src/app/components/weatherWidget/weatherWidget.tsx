@@ -9,7 +9,23 @@ import { timeStamp } from "console";
 export default function WeatherDataWidget() {
 
     const [coordinates, setCoordinates] = useState('51.507351,-0.127758');
-    const [weatherData, setWeatherData] = useState({ error : true, data : {} });
+    const [weatherData, setWeatherData] = useState({ error : true, data : {
+        name : '',
+        main : {
+            temp : 0,
+            temp_min : 0,
+            temp_max : 0,
+            humidity : 0
+        },
+        clouds : { all : '' },
+        weather : [],
+        wind : {
+            deg : 0,
+            gust: 0,
+            speed: 0
+        },
+        dt : 0
+    } });
 
     const generateApiUrl = (lat, long) => {
         return 'https://api.openweathermap.org/data/2.5/weather?lat='+lat+'&lon='+long+'&units=metric&appid=9d62db2cbe320dd848087774768b908c';
@@ -22,7 +38,23 @@ export default function WeatherDataWidget() {
             setWeatherData({error: false, data : response.data});
         })
         .catch(function (error) {
-            setWeatherData({error : true, data : {}})
+            setWeatherData({error : true, data : {
+                name : '',
+                main : {
+                    temp : 0,
+                    temp_min : 0,
+                    temp_max : 0,
+                    humidity : 0
+                },
+                clouds : { all : '' },
+                weather : [],
+                wind : {
+                    deg : 0,
+                    gust: 0,
+                    speed: 0
+                },
+                dt : 0
+            }})
         });
 
     }, [coordinates]);
@@ -106,9 +138,9 @@ export default function WeatherDataWidget() {
                         </ul>
                         <h5>Wind</h5>
                         <ul>
-                            <li><div>Direction</div><div>{weatherData.data.main.temp}°</div></li>
-                            <li><div>Gust</div><div>{weatherData.data.main.temp_min} m/sec</div></li>
-                            <li><div>Speed</div><div>{weatherData.data.main.temp_max} m/sec</div></li>
+                            <li><div>Direction</div><div>{weatherData.data.wind.deg}°</div></li>
+                            <li><div>Gust</div><div>{weatherData.data.wind.gust} m/sec</div></li>
+                            <li><div>Speed</div><div>{weatherData.data.wind.speed} m/sec</div></li>
                         </ul>
                     </div>
                 </div>
